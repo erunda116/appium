@@ -1,5 +1,6 @@
 from appium import webdriver
 from appium.webdriver.common.appiumby import AppiumBy
+from selenium.common.exceptions import NoSuchElementException
 from appium.webdriver.extensions.android.nativekey import AndroidKey
 from appium.webdriver.extensions.keyboard import Keyboard
 from selenium.common.exceptions import WebDriverException
@@ -9,6 +10,10 @@ import time
 import random
 
 from selenium.webdriver import Keys
+
+log_file = open('log_file.log', 'a')
+
+
 
 tags_list = ["lisboa","shibainu", "madeira", "otters"]
 
@@ -26,71 +31,104 @@ def test_start():
     driver = webdriver.Remote(url, capabilities)
     touch = TouchAction(driver)
 
-    def tags_coder(tag_name):
+    def tags_coder(tag_name, is_hashtag=False):
         tag_name = tag_name.upper()
         android_alphabet ={"A": 29, "B": 30, "C": 31, "D": 32, "E": 33, "F": 34, "G": 35, "H": 36, "I": 37, "J": 38, "K": 39, "L": 40,
          "M": 41, "N": 42, "O": 43, "P": 44, "Q": 45, "R": 46, "S": 47, "T": 48, "U": 49, "V": 50, "W": 51, "X": 52,
          "Y": 53, "Z":54}
-        driver.press_keycode(AndroidKey.POUND)
+        if is_hashtag:
+            driver.press_keycode(AndroidKey.POUND)
         for letter in tag_name:
             i = android_alphabet[letter]
             driver.press_keycode(i)
-
-    def post_liker():
-        #open a post
-        #whole_screen
-        print('c1')
-        whole_screen = driver.find_element(by=AppiumBy.XPATH, value='//androidx.recyclerview.widget.RecyclerView[@resource-id="com.instagram.android:id/recycler_view"]')
-        one_of_photos = whole_screen.find_elements(by=AppiumBy.CLASS_NAME, value='android.widget.Button')[1]
-        wait_a_bit(2, 4)
-        print('c2')
-        one_of_photos.click()
-        print('c2a')
-        wait_a_bit(1, 3)
-        print('c3')
-        touch.press(x=100, y=955).wait(500).move_to(x=130, y=100).release().perform()
-        #find like btn
-        like_btn = driver.find_element(by=AppiumBy.XPATH, value='//android.widget.ImageView[@content-desc="Like"]')
-        print('c4')
-        if like_btn is None:
-            touch.press(x=100, y=955).wait(500).move_to(x=130, y=100).release().perform()
-            print('c5')
-        else:
-            like_btn.click()
-            print('c6')
+        driver.press_keycode(66)
+        wait_a_bit(1,3)
 
 
+    def post_liker(like_amount):
+        i = 0
+        while i < like_amount:
+            #scroll the feed
+            wait_a_bit(1, 3)
+            start_x = random.randrange(100,450)
+            start_y = random.randrange(799, 1132)
+            end_x = random.randrange(77, 470)
+            end_y = random.randrange(100, 234)
+            start_x1 = start_x + random.randrange(1, 15)
+            start_y1 = start_y + random.randrange(1, 15)
+            end_x1 = end_x + random.randrange(1, 15)
+            end_y1 = end_y + random.randrange(1, 15)
+            touch.press(x=start_x, y=start_y).wait(500).move_to(x=end_x, y=end_y).release().perform()
+            #find like btn
+            try:
+                like_btn = driver.find_element(by=AppiumBy.XPATH, value='//android.widget.ImageView[@content-desc="Like"]')
+                like_btn.click()
+                print(like_btn)
+            except NoSuchElementException:
+                print('no found')
+            finally:
+                touch.press(x=start_x1, y=start_y1).wait(500).move_to(x=end_x1, y=end_y1).release().perform()
+                wait_a_bit(2, 4)
+                i += 1
+
+
+    def find_and_click(method='XPATH', val='',start_wait=1, end_wait=15):
+        try:
+            if method == 'XPATH':
+                element = driver.find_element(by=AppiumBy.XPATH, value=val)
+                log_file.write(f'Element by {method} with {val} was found. ' + time.ctime() + '\n')
+            elif method == 'ID':
+                element = driver.find_element(by=AppiumBy.ID, value=val)
+                log_file.write(f'Element by {method} with {val} was found. ' + time.ctime() + '\n')
+            elif method == 'CLASS_NAME':
+                element = driver.find_element(by=AppiumBy.CLASS_NAME, value=val)
+                log_file.write(f'Element by {method} with {val} was found. ' + time.ctime() + '\n')
+            element.click()
+        except NoSuchElementException:
+            log_file.write(f'Element by {method} with {val} was not found. ' + time.ctime() + '\n')
+        wait_a_bit(start_wait, end_wait)
 
     try:
-        #open Instagram App
-        # digit1_btn = driver.find_element(by=AppiumBy.XPATH, value='//android.widget.TextView[@content-desc="Instagram"]')
-        # digit1_btn.click()
-        # wait_a_bit(3, 12)
-
-        post_liker()
-
-        # #swipe func
-        # # touch = TouchAction(driver)
-        # # touch.press(x=100, y=955).wait(500).move_to(x=130, y=100).release().perform()
-        # #end swipe
+        # #open Instagram App
+        # find_and_click('XPATH', '//android.widget.TextView[@content-desc="Instagram"]', 3, 12)
         #
-        # #click to search btn !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        # search_btn = driver.find_element(by=AppiumBy.ID, value='com.instagram.android:id/search_tab')
-        # search_btn.click()
-        # wait_a_bit(1, 3)
+        # #click to search bar button
+        # find_and_click('ID', 'com.instagram.android:id/search_tab', 1, 3)
         #
-        # #search bar
-        # search_bar = driver.find_element(by=AppiumBy.XPATH, value='//android.widget.EditText[@resource-id="com.instagram.android:id/action_bar_search_edit_text"]')
-        # search_bar.click()
-        # print('checkpoint1')
-        # #search_bar.send_keys('#shibainu')
-        # print('checkpoint2')
+        # #click on search bar panel
+        # find_and_click('XPATH', '//android.widget.EditText[@resource-id="com.instagram.android:id/action_bar_search_edit_text"]', 2, 4)
         #
+        # #put search name
+        # tags_coder('alameda')
+        #
+        # # swipe to like by location
+        # touch = TouchAction(driver)
+        # touch.press(x=600, y=195).wait(500).move_to(x=54, y=202).release().perform()
         # wait_a_bit(2, 4)
-        # # tags_search (make multiple)
-        # tags_coder('lisboa')
-        # print('checkpoint3')
-        # wait_a_bit(2, 4)
+        #
+        # # click to places
+        # find_and_click('XPATH', '//android.widget.HorizontalScrollView[@resource-id="com.instagram.android:id/scrollable_tab_layout"]/android.widget.LinearLayout/android.widget.LinearLayout[5]', 1, 3)
+        #
+        # # click to first location
+        # find_and_click('XPATH', '(//android.widget.LinearLayout[@resource-id="com.instagram.android:id/row_places_container"])[1]', 4, 7)
+        #
+        # #click to recent posts
+        # find_and_click('XPATH', '//android.widget.TextView[@content-desc="Most Recent Posts"]', 2, 5)
+
+        #click to first photo
+        find_and_click('CLASS_NAME', 'android.widget.Button', 2, 5)
+        post_liker(3)
+        print('complete sucessfully')
+
+
+        #post_liker()
+        #swipe func
+        # touch = TouchAction(driver)
+        # touch.press(x=100, y=955).wait(500).move_to(x=130, y=100).release().perform()
+        #end swipe
+
+        # tags_search (make multiple)
+
         #
         # #find first match
         # first_match = driver.find_element(by=AppiumBy.XPATH, value='(//android.widget.FrameLayout[@resource-id="com.instagram.android:id/row_hashtag_container"])[1]/android.widget.LinearLayout')
@@ -116,16 +154,16 @@ def test_start():
         # for i in range(6):
         #     touch.press(x=100, y=955).wait(500).move_to(x=130, y=100).release().perform()
         #     wait_a_bit(1, 3)
-
-        #driver.tap()
-        wait_a_bit(3, 12)
+        #
+        # #driver.tap()
+        # wait_a_bit(3, 12)
 
         #!!!!!!!!!!!!!!!!!!!!
 
     finally:
 
         driver.quit()
-
+        log_file.close()
 
 if __name__ == '__main__':
     test_start()

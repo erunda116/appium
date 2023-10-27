@@ -1,0 +1,12 @@
+Element by XPATH with //android.widget.TextView[@content-desc="Instagram"] was found. Fri Oct 27 20:45:34 2023
+Element by ID with com.instagram.android:id/search_tab was found. Fri Oct 27 20:45:41 2023
+Element by XPATH with //android.widget.EditText[@resource-id="com.instagram.android:id/action_bar_search_edit_text"] was found. Fri Oct 27 20:45:44 2023
+Element by XPATH with //android.widget.HorizontalScrollView[@resource-id="com.instagram.android:id/scrollable_tab_layout"]/android.widget.LinearLayout/android.widget.LinearLayout[5] was found. Fri Oct 27 20:46:00 2023
+Element by XPATH with (//android.widget.LinearLayout[@resource-id="com.instagram.android:id/row_places_container"])[1] was found. Fri Oct 27 20:46:02 2023
+Element by XPATH with //android.widget.TextView[@content-desc="Most Recent Posts"] was found. Fri Oct 27 20:46:07 2023
+Element by CLASS_NAME with com.instagram.android:id/search_tab was not found. Fri Oct 27 20:46:12 2023
+Element by CLASS_NAME with android.widget.Button was found. Fri Oct 27 20:48:06 2023
+Element by CLASS_NAME with android.widget.Button was found. Fri Oct 27 21:20:39 2023
+Element by CLASS_NAME with android.widget.Button was found. Fri Oct 27 21:21:08 2023
+Element by CLASS_NAME with android.widget.Button was found. Fri Oct 27 21:24:20 2023
+Element by CLASS_NAME with android.widget.Button was found. Fri Oct 27 21:29:44 2023
