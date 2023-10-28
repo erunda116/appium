@@ -31,6 +31,8 @@ def test_start():
     driver = webdriver.Remote(url, capabilities)
     touch = TouchAction(driver)
 
+    log_file.write(f'Start scrapping ' + time.ctime() + '\n')
+
     def tags_coder(tag_name, is_hashtag=False):
         tag_name = tag_name.upper()
         android_alphabet ={"A": 29, "B": 30, "C": 31, "D": 32, "E": 33, "F": 34, "G": 35, "H": 36, "I": 37, "J": 38, "K": 39, "L": 40,
@@ -44,10 +46,15 @@ def test_start():
         driver.press_keycode(66)
         wait_a_bit(1,3)
 
+    def check_exists_by_xpath(xpath):
+        try:
+            driver.find_element(by=AppiumBy.XPATH, value=xpath)
+        except NoSuchElementException:
+            return False
+        return True
 
     def post_liker(like_amount):
-        i = 0
-        while i < like_amount:
+        while like_amount != 0:
             #scroll the feed
             wait_a_bit(1, 3)
             start_x = random.randrange(100,450)
@@ -58,19 +65,19 @@ def test_start():
             start_y1 = start_y + random.randrange(1, 15)
             end_x1 = end_x + random.randrange(1, 15)
             end_y1 = end_y + random.randrange(1, 15)
-            touch.press(x=start_x, y=start_y).wait(500).move_to(x=end_x, y=end_y).release().perform()
+            wait_time = random.randrange(270, 510)
+            wait_time1 = random.randrange(270, 510)
+            touch.press(x=start_x, y=start_y).wait(wait_time).move_to(x=end_x, y=end_y).release().perform()
             #find like btn
-            try:
-                like_btn = driver.find_element(by=AppiumBy.XPATH, value='//android.widget.ImageView[@content-desc="Like"]')
+            if check_exists_by_xpath('//android.widget.ImageView[@content-desc="Like"]'):
+                like_btn = driver.find_element(by=AppiumBy.XPATH,
+                                               value='//android.widget.ImageView[@content-desc="Like"]')
                 like_btn.click()
-                print(like_btn)
-            except NoSuchElementException:
-                print('no found')
-            finally:
-                touch.press(x=start_x1, y=start_y1).wait(500).move_to(x=end_x1, y=end_y1).release().perform()
-                wait_a_bit(2, 4)
-                i += 1
+                like_amount -= 1
+                log_file.write(f'Post liked sucessfully ' + time.ctime() + '\n')
 
+            touch.press(x=start_x1, y=start_y1).wait(wait_time1).move_to(x=end_x1, y=end_y1).release().perform()
+            wait_a_bit(2, 4)
 
     def find_and_click(method='XPATH', val='',start_wait=1, end_wait=15):
         try:
@@ -88,10 +95,15 @@ def test_start():
             log_file.write(f'Element by {method} with {val} was not found. ' + time.ctime() + '\n')
         wait_a_bit(start_wait, end_wait)
 
+    def tags_searching(lst):
+        for tag in lst:
+            pass
     try:
+        wait_a_bit(1, 3)
+        driver.press_keycode(4) #back button
         # #open Instagram App
         # find_and_click('XPATH', '//android.widget.TextView[@content-desc="Instagram"]', 3, 12)
-        #
+
         # #click to search bar button
         # find_and_click('ID', 'com.instagram.android:id/search_tab', 1, 3)
         #
@@ -114,14 +126,34 @@ def test_start():
         #
         # #click to recent posts
         # find_and_click('XPATH', '//android.widget.TextView[@content-desc="Most Recent Posts"]', 2, 5)
+        #
+        # #click to first photo
+        # find_and_click('CLASS_NAME', 'android.widget.Button', 2, 5)
+        # post_liker(8)
 
-        #click to first photo
-        find_and_click('CLASS_NAME', 'android.widget.Button', 2, 5)
-        post_liker(3)
-        print('complete sucessfully')
+
+    finally:
+
+        driver.quit()
+        log_file.write(f'End scrapping ' + time.ctime() + '\n')
+        log_file.close()
+
+if __name__ == '__main__':
+    test_start()
 
 
-        #post_liker()
+
+# {
+#   "appium:deviceName": "Google_Nexus_9",
+#   "platformName": "Android",
+#   "appium:automationName": "UiAutomator2",
+#   "appium:noReset": "True"
+# }
+
+
+
+
+#post_liker()
         #swipe func
         # touch = TouchAction(driver)
         # touch.press(x=100, y=955).wait(500).move_to(x=130, y=100).release().perform()
@@ -159,20 +191,3 @@ def test_start():
         # wait_a_bit(3, 12)
 
         #!!!!!!!!!!!!!!!!!!!!
-
-    finally:
-
-        driver.quit()
-        log_file.close()
-
-if __name__ == '__main__':
-    test_start()
-
-
-
-# {
-#   "appium:deviceName": "Google_Nexus_9",
-#   "platformName": "Android",
-#   "appium:automationName": "UiAutomator2",
-#   "appium:noReset": "True"
-# }
