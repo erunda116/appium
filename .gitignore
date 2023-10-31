@@ -2,3 +2,6 @@
 venv/Lib
 # Игнорировать log файлы
 *.log
+.idea
+test.py
+
