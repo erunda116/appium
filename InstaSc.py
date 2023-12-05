@@ -38,7 +38,7 @@ class InstaSc:
                                 "J": 38, "K": 39, "L": 40,
                                 "M": 41, "N": 42, "O": 43, "P": 44, "Q": 45, "R": 46, "S": 47, "T": 48, "U": 49,
                                 "V": 50, "W": 51, "X": 52,
-                                "Y": 53, "Z": 54, "#": AndroidKey.POUND}
+                                "Y": 53, "Z": 54, "#": AndroidKey.POUND, " ": AndroidKey.SPACE}
         for letter in tag_name:
             i = android_alphabet[letter]
             self.driver.press_keycode(i)
@@ -68,7 +68,7 @@ class InstaSc:
     def post_liker(self, like_amount):
         self.like_amount = like_amount
         rand_swipe = random.randrange(1, 6)
-        rand_deadtime = random.randrange(80, 120)
+        rand_deadtime = random.randrange(80*self.like_amount, 200*self.like_amount)
         deadline = time.monotonic() + rand_deadtime
         while like_amount != 0:
             self.random_vertical_swipe(1)
@@ -128,9 +128,22 @@ class InstaSc:
                 self.tags_coder(tag)
 
                 if tag[0] == '#':
+
+                    #swipe to tags !!!! !!!! DRY!!!
+                    # swipe to like by location
+                    touch = TouchAction(self.driver)
+                    touch.press(x=600, y=195).wait(500).move_to(x=54, y=202).release().perform()
+                    self.wait_a_bit(2, 4)
+
+                    #click to tags
+                    self.find_and_click('XPATH',
+                                        '//android.widget.TabWidget[@text="Tags"]',
+                                        1, 3)
+
                     # find first match
                     self.find_and_click('XPATH',
-                                   '(//android.widget.FrameLayout[@resource-id="com.instagram.android:id/row_hashtag_container"])[1]/android.widget.LinearLayout')
+                                        '(//android.widget.FrameLayout[@resource-id="com.instagram.android:id/row_hashtag_container"])[1]')
+
                     # click to filter
                     self.find_and_click('XPATH',
                                    '//android.widget.Button[@resource-id="com.instagram.android:id/filter_text_to_open_bottom_sheet"]',
@@ -147,13 +160,13 @@ class InstaSc:
 
                     # click to places
                     self.find_and_click('XPATH',
-                                   '//android.widget.HorizontalScrollView[@resource-id="com.instagram.android:id/scrollable_tab_layout"]/android.widget.LinearLayout/android.widget.LinearLayout[5]',
+                                   '//android.widget.HorizontalScrollView[@resource-id="com.instagram.android:id/scrollable_tab_layout"]/android.widget.LinearLayout/android.widget.LinearLayout[4]',
                                    1, 3)
 
                     # click to first location
                     self.find_and_click('XPATH',
                                    '(//android.widget.LinearLayout[@resource-id="com.instagram.android:id/row_places_container"])[1]',
-                                   4, 7)
+                                   7, 13)
 
                     # click to recent posts
                     self.find_and_click('XPATH', '//android.widget.TextView[@content-desc="Most Recent Posts"]', 6, 10)
@@ -178,4 +191,4 @@ class InstaSc:
 
 
 s = InstaSc()
-s.go_scrapp(["lisboa","#otters"],2)
+s.go_scrapp(["marques de pombal", "avenida roma","#caisdosodre", "#campopequenolisboa", "saldanha", "vanite beauty bar"],20)

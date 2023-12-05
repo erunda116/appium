@@ -4,4 +4,5 @@ venv/Lib
 *.log
 .idea
 test.py
+main.py
 
